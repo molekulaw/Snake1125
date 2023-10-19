@@ -20,6 +20,7 @@ namespace ConsoleApp18
         static Graphics graphics; // специальный класс для рисования
         static Random random = new Random(); // рандомайзер для яблока
         static int[] apple = new int[2]; // координаты яблока
+        static int[] poisonApple = new int[2]; //координаты отравленного яблока
         static int gameScore = 0; // кол-во очков
         static bool gameRunning = true; // если выставить в false, змейка перестанет бежать
         static bool gamePause = false; // если выставить в true, змейка перестанет бежать, обратное переключение запустит змейку вновь
@@ -32,6 +33,7 @@ namespace ConsoleApp18
             graphics.Clear(Color.Black); // очистка экрана
             InitSnake(); // начальная инициализация змейки
             GenerateApple(); // генерация яблока
+            GeneratePoisonApple(); // генерация отравленного яблока
             threadSnake = new Thread(RunSnake); // создание потока для движения змейки
             threadSnake.Start(); // запуск потока
             RunConrol(); // запуск цикла с управлением
@@ -41,7 +43,8 @@ namespace ConsoleApp18
         {
             while (gameRunning)
             {   // в цикле читаем нажатую кнопку.
-                ConsoleKeyInfo key = Console.ReadKey();                
+                ConsoleKeyInfo key = Console.ReadKey();
+                Console.SetCursorPosition(0, 0);
                 if (controlBlock)   // если controlBlock стоит в значении true, то переход к следующей итерации
                     continue;
                 controlBlock = true; // временная блокировка управления, снимается в GetNextCoordinates
@@ -52,6 +55,7 @@ namespace ConsoleApp18
                 if (snake.Count > 1 && oldDirection != direction && oldDirection % 2 == direction % 2) // если направление было изменено на противоположное
                 {
                     GameOver(); // закончить игру
+                    Restart(); // запрос с рестартом игры
                 }
             }
         }
@@ -71,6 +75,7 @@ namespace ConsoleApp18
                 if (CheckSnakeIntersect()) // проверка на то, что змейка пересекла себя
                 {
                     GameOver(); // стоп игры и вывод итогов
+                    Restart(); // запрос с рестартом игры
                 }
                 else if (SnakeEatApple()) // проверка на то, что змейка пересекла яблоко
                 {
@@ -78,6 +83,13 @@ namespace ConsoleApp18
                     IncreaseGameScore(); // увеличение кол-во очков
                     IncreaseGameSpeed(); // увеличение скорости движения змейки
                     GenerateApple(); // генерация нового яблока
+                }
+                else if (SnakeEatPoisonApple()) // проверка на то, что змейка пересекла отравленное яблоко
+                {
+                    DecreaseSnake(); // уменьшение длины змейки
+                    DecreaseGameScore(); // уменьшение количества очков
+                    GeneratePoisonApple(); // генерация нового яблока
+                    VivodOchkov(); // вывод очков в заголовок
                 }
             }
         }
@@ -90,6 +102,14 @@ namespace ConsoleApp18
                 return;
             for (int i = maxIndex; i > 0; i--)
                 snake[i] = snake[i - 1];
+        }
+        private static void ProverkaPoisonApple()
+        {
+            if (SnakeEatPoisonApple() && gameScore == 0)
+            {
+                GameOver(); // прекращение игры
+                Restart(); // запрос с рестартом игры
+            }
         }
     }
 }

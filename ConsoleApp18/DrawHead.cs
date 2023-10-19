@@ -10,7 +10,7 @@ namespace ConsoleApp18
     {
         private static void DrawHead()
         {
-            graphics.FillEllipse(System.Drawing.Brushes.Red, snake[0][0], snake[0][1], 10, 10); // нарисовать красный круг размером 10 на 10 по координатам нулевой ячейки змейки
+            graphics.FillEllipse(System.Drawing.Brushes.Green, snake[0][0], snake[0][1], 10, 10); // нарисовать красный круг размером 10 на 10 по координатам нулевой ячейки змейки
         }
     }
 }
